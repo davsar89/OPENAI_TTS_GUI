@@ -49,6 +49,12 @@ This Python script provides a GUI for generating audio files from text input usi
 - The generated audio files are saved in the `generated_sounds` directory.
 - The input text logs are saved in the `text_logs` directory.
 
+## GUI Screenshot
+
+Here is a screenshot of the GUI:
+
+![GUI Screenshot](gui_screenshot.png)
+
 ## Notes
 
 - Ensure you have a stable internet connection, as the script communicates with the OpenAI API to generate the audio.
