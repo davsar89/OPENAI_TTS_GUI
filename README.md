@@ -60,7 +60,5 @@ This Python script provides a GUI for generating audio files from text input usi
 - If the script fails to generate audio, check the API key set for the environment variable `OPENAI_API_KEY` and ensure it is correctly set.
 - Make sure the required Python packages are installed and up to date.
 
-## License
 
-This project is licensed under the MIT License.
 
