@@ -1,4 +1,4 @@
-# Text to Speech Generator
+# Text to Speech Generator Using OpenAI API
 
 This Python script provides a GUI for generating audio files from text input using the OpenAI text-to-speech API. The generated audio files are saved in a specified directory, and the input text is logged in a separate directory.
 
