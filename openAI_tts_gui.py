@@ -1,10 +1,13 @@
 import tkinter as tk
+from tkinter import ttk
+from tkinter import scrolledtext
 from tkinter import messagebox
 from pathlib import Path
 from openai import OpenAI
 import datetime
 import pygame
 import threading
+from ttkthemes import ThemedTk
 
 client = OpenAI()
 
@@ -59,7 +62,6 @@ def generate_audio_thread():
     selected_voice = voice_var.get()
     selected_speed = speed_var.get()
     
-    # Log the input text
     log_input_text(theText, text_log_directory, timestamp)
     
     input_chunks = split_text(theText)
@@ -67,12 +69,17 @@ def generate_audio_thread():
     for ii, chunk in enumerate(input_chunks):
         last_generated_file = generate_sound(chunk, ii, audio_directory, timestamp, selected_voice, selected_speed)
         generated_files.append(last_generated_file)
+        progress = (ii + 1) / len(input_chunks) * 100
+        progress_bar['value'] = progress
+        root.update_idletasks()
 
     files_list = "\n".join([str(file) for file in generated_files])
-    status_label.config(text=f"Audio files have been generated successfully.\n{files_list}", fg="green")
+    status_label.config(text=f"Audio files generated successfully.\n{files_list}", foreground="green")
+    progress_bar['value'] = 0
 
 def generate_audio():
-    status_label.config(text="Processing text, please wait...", fg="red")
+    status_label.config(text="Processing text, please wait...")
+    progress_bar['value'] = 0
     threading.Thread(target=generate_audio_thread).start()
 
 def play_last_sound():
@@ -86,41 +93,55 @@ def play_last_sound():
         messagebox.showwarning("Play Error", "No audio file generated yet or file not found.")
 
 # Setting up the GUI
-root = tk.Tk()
+root = ThemedTk(theme="arc")
 root.title("Text to Speech Generator")
+root.geometry("600x650")
 
-frame = tk.Frame(root, padx=10, pady=10)
-frame.pack(padx=10, pady=10)
+style = ttk.Style()
+style.configure("TButton", padding=10, font=('Helvetica', 10))
+style.configure("TLabel", font=('Helvetica', 10))
 
-text_label = tk.Label(frame, text="Enter Text:")
-text_label.grid(row=0, column=0, sticky="w")
+frame = ttk.Frame(root, padding="20 20 20 20")
+frame.pack(fill=tk.BOTH, expand=True)
 
-text_box = tk.Text(frame, wrap="word", width=60, height=15)
-text_box.grid(row=1, column=0, columnspan=2, pady=(5, 10))
+text_label = ttk.Label(frame, text="Enter Text:")
+text_label.grid(row=0, column=0, sticky="w", pady=(0, 5))
 
-voice_label = tk.Label(frame, text="Select Voice:")
+text_box = scrolledtext.ScrolledText(frame, wrap=tk.WORD, width=60, height=15, font=('Helvetica', 10))
+text_box.grid(row=1, column=0, columnspan=2, pady=(0, 20), sticky="nsew")
+
+voice_label = ttk.Label(frame, text="Select Voice:")
 voice_label.grid(row=2, column=0, sticky="w")
 
 voice_var = tk.StringVar(value="onyx")
-voice_menu = tk.OptionMenu(frame, voice_var, *voice_options)
-voice_menu.grid(row=2, column=1, sticky="w")
+voice_menu = ttk.Combobox(frame, textvariable=voice_var, values=voice_options, state="readonly", width=15)
+voice_menu.grid(row=2, column=1, sticky="w", pady=(0, 10))
 
-speed_label = tk.Label(frame, text="Select Speed:")
+speed_label = ttk.Label(frame, text="Select Speed:")
 speed_label.grid(row=3, column=0, sticky="w")
 
 speed_var = tk.DoubleVar(value=1.05)
-speed_scale = tk.Scale(frame, variable=speed_var, from_=0.5, to=2.0, resolution=0.01, orient=tk.HORIZONTAL)
-speed_scale.grid(row=3, column=1, sticky="w")
+speed_scale = ttk.Scale(frame, variable=speed_var, from_=0.5, to=2.0, orient=tk.HORIZONTAL, length=200)
+speed_scale.grid(row=3, column=1, sticky="w", pady=(0, 20))
 
-generate_button = tk.Button(frame, text="Generate Audio", command=generate_audio)
-generate_button.grid(row=4, column=0, columnspan=2, pady=(5, 0))
+speed_value_label = ttk.Label(frame, textvariable=speed_var)
+speed_value_label.grid(row=3, column=1, sticky="e")
 
-play_button = tk.Button(frame, text="Play Last Generated Audio", command=play_last_sound)
-play_button.grid(row=5, column=0, columnspan=2, pady=(5, 0))
+generate_button = ttk.Button(frame, text="Generate Audio", command=generate_audio)
+generate_button.grid(row=4, column=0, columnspan=2, pady=(0, 10))
 
-status_label = tk.Label(frame, text="", fg="red", justify=tk.LEFT)
-status_label.grid(row=6, column=0, columnspan=2)
+play_button = ttk.Button(frame, text="Play Last Generated Audio", command=play_last_sound)
+play_button.grid(row=5, column=0, columnspan=2, pady=(0, 20))
+
+progress_bar = ttk.Progressbar(frame, orient=tk.HORIZONTAL, length=300, mode='determinate')
+progress_bar.grid(row=6, column=0, columnspan=2, pady=(0, 10))
+
+status_label = ttk.Label(frame, text="", wraplength=500, justify=tk.LEFT)
+status_label.grid(row=7, column=0, columnspan=2)
 
 last_generated_file = None
+
+frame.columnconfigure(1, weight=1)
+frame.rowconfigure(1, weight=1)
 
 root.mainloop()
