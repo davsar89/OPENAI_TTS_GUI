@@ -6,6 +6,7 @@ This Python script provides a GUI for generating audio files from text input usi
 
 - Python 3.x
 - Tkinter (usually included with Python)
+- ttkthemes
 - OpenAI API
 - Pygame
 - pathlib
@@ -19,7 +20,7 @@ This Python script provides a GUI for generating audio files from text input usi
 2. Install the required Python packages:
 
     ```bash
-    pip install openai pygame
+    pip install openai pygame ttkthemes
     ```
 
 3. Ensure you have the OpenAI API key set up. You can do this by setting an environment variable `OPENAI_API_KEY` with your API key.
